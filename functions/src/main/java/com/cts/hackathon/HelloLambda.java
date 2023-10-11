@@ -1,13 +1,18 @@
 package com.cts.hackathon;
 
+import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.RequestHandler;
+
 /**
  * Hello world!
  *
  */
-public class HelloLambda implements RequestHandler
+public class HelloLambda implements RequestHandler<String, String>
 {
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+
+    @Override
+    public String handleRequest(String name, Context context) {
+        return "Hello from AWS Lambda " + name;
     }
+
 }
