@@ -2,6 +2,7 @@ package com.myorg;
 
 import software.amazon.awscdk.Duration;
 import software.amazon.awscdk.RemovalPolicy;
+import software.amazon.awscdk.services.apigateway.LambdaRestApi;
 import software.amazon.awscdk.services.lambda.Code;
 import software.amazon.awscdk.services.lambda.Function;
 import software.amazon.awscdk.services.lambda.Runtime;
@@ -28,7 +29,7 @@ public class InfrastructureStack extends Stack {
                 .code(Code.fromAsset("../assets/function.jar"))
                 .runtime(Runtime.JAVA_11)
                 .build();
-        Bucket bucket = Bucket.Builder.create(this, "cdk-java-idp-bucket")
+        Bucket.Builder.create(this, "cdk-java-idp-bucket")
                 .objectOwnership(ObjectOwnership.BUCKET_OWNER_ENFORCED)
                 .encryption(BucketEncryption.S3_MANAGED)
                 .blockPublicAccess(BlockPublicAccess.BLOCK_ALL)
@@ -38,5 +39,17 @@ public class InfrastructureStack extends Stack {
                 .enforceSsl(true)
                 .objectLockEnabled(false)
                 .build();
+
+        final Function hello = Function.Builder.create(this, "HelloHandler")
+                .runtime(Runtime.NODEJS_18_X)    // execution environment
+                .code(Code.fromAsset("src/lambda"))  // code loaded from the "lambda" directory
+                .handler("hello.handler")        // file is "hello", function is "handler"
+                .build();
+
+        // create an amazon API Gateway REST API
+        LambdaRestApi.Builder.create(this, "Endpoint")
+                .handler(hello)
+                .build();
+
     }
 }
